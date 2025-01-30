@@ -138,6 +138,10 @@
             background-color: #444;
         }
 
+        .article-content.show {
+            display: block;
+        }
+
         .return-action {
             position: fixed;
             bottom: 20px;
@@ -301,44 +305,38 @@
         // Функция для удаления статьи
         function deleteArticle(index) {
             const articles = JSON.parse(localStorage.getItem('articles')) || [];
-            const deletedArticle = articles.splice(index, 1)[0];
-            deletedArticles.push(deletedArticle);
+            deletedArticles.push(articles.splice(index, 1)[0]);
             localStorage.setItem('articles', JSON.stringify(articles));
             renderArticles();
         }
 
-        // Функция для возврата последнего удаленного действия
+        // Функция для восстановления удаленной статьи
         function undoDelete() {
             if (deletedArticles.length > 0) {
-                const lastDeletedArticle = deletedArticles.pop();
                 const articles = JSON.parse(localStorage.getItem('articles')) || [];
-                articles.push(lastDeletedArticle);
+                articles.push(deletedArticles.pop());
                 localStorage.setItem('articles', JSON.stringify(articles));
                 renderArticles();
             }
         }
 
-        // Функция для переключения тем
+        // Функция для переключения темы
         function toggleDarkTheme() {
             const body = document.body;
-            const isDark = body.classList.toggle('dark-theme');
-            const themeIconLight = document.getElementById('theme-icon-light');
-            const themeIconDark = document.getElementById('theme-icon-dark');
-
-            themeIconLight.style.display = isDark ? 'none' : 'block';
-            themeIconDark.style.display = isDark ? 'block' : 'none';
-
-            // Сохраняем выбранную тему в localStorage
-            const theme = isDark ? 'dark-theme' : 'light-theme';
-            localStorage.setItem('theme', theme);
-            updateThemeIcon(theme);
+            if (body.classList.contains('dark-theme')) {
+                body.classList.replace('dark-theme', 'light-theme');
+                localStorage.setItem('theme', 'light-theme');
+            } else {
+                body.classList.replace('light-theme', 'dark-theme');
+                localStorage.setItem('theme', 'dark-theme');
+            }
+            updateThemeIcon(body.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme');
         }
 
-        // Обновление иконки переключателя темы
+        // Обновление иконки темы
         function updateThemeIcon(theme) {
-            const themeToggleBtn = document.querySelector('.theme-toggle-btn');
-            const sunIcon = themeToggleBtn.querySelector('.fa-sun');
-            const moonIcon = themeToggleBtn.querySelector('.fa-moon');
+            const sunIcon = document.querySelector('.fa-sun');
+            const moonIcon = document.querySelector('.fa-moon');
             if (theme === 'dark-theme') {
                 sunIcon.style.display = 'none';
                 moonIcon.style.display = 'block';
